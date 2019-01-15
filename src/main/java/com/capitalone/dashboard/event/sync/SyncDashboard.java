@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -75,24 +76,25 @@ public class SyncDashboard {
         /**
          * The assumption is the dashboard already has a SCM widget and the sync process should not add SCM widgets.
          */
-        if(CollectorType.SCM.equals(collectorType)) return;
+        if (CollectorType.SCM.equals(collectorType)) return;
 
         existingDashboards.forEach((Dashboard dashboard) -> {
             ObjectId componentId = dashboard.getWidgets().get(0).getComponentId();
             StandardWidget standardWidget = new StandardWidget(collectorType, componentId);
-            com.capitalone.dashboard.model.Component component = componentRepository.findOne(componentId);
-            if (component != null) {
-                component.addCollectorItem(collectorType, collectorItem);
-                componentRepository.save(component);
-                collectorItem.setEnabled(true);
-                collectorItemRepository.save(collectorItem);
+            componentRepository.findById(componentId).ifPresent(component -> {
+                if (component != null) {
+                    component.addCollectorItem(collectorType, collectorItem);
+                    componentRepository.save(component);
+                    collectorItem.setEnabled(true);
+                    collectorItemRepository.save(collectorItem);
 
-                if (addWidget && (getWidget(standardWidget.getName(), dashboard) == null)) {
-                    Widget widget = standardWidget.getWidget();
-                    dashboard.getWidgets().add(widget);
-                    dashboardRepository.save(dashboard);
+                    if (addWidget && (getWidget(standardWidget.getName(), dashboard) == null)) {
+                        Widget widget = standardWidget.getWidget();
+                        dashboard.getWidgets().add(widget);
+                        dashboardRepository.save(dashboard);
+                    }
                 }
-            }
+            });
         });
     }
 
@@ -125,7 +127,7 @@ public class SyncDashboard {
         /** Step 1: Add build collector item to Dashboard if built repo is in on the dashboard. **/
 
         // Find the collectorItem of build
-        CollectorItem buildCollectorItem = collectorItemRepository.findOne(build.getCollectorItemId());
+        Optional<CollectorItem> buildCollectorItem = collectorItemRepository.findById(build.getCollectorItemId());
 
         //Find possible collectors and then the collector ids for SCM
         List<Collector> scmCollectors = collectorRepository.findAllByCollectorType(CollectorType.SCM);
@@ -143,11 +145,12 @@ public class SyncDashboard {
                 .forEach(collectorItems -> CollectionUtils.addAll(repoCollectorItemsInBuild, collectorItems.iterator()));
 
         // For each repo collector item, add the item to the referenced dashboards
-        repoCollectorItemsInBuild.forEach(
-                ci -> {
-                    relatedCollectorItemRepository.saveRelatedItems(buildCollectorItem.getId(), ci.getId(), this.getClass().toString(),  BUILD_REPO_REASON);
-                }
+        buildCollectorItem.ifPresent(item ->
+                repoCollectorItemsInBuild.forEach(
+                        ci -> relatedCollectorItemRepository.saveRelatedItems(item.getId(), ci.getId(), this.getClass().toString(), BUILD_REPO_REASON)
+                )
         );
+
     }
 
     /**
@@ -158,9 +161,9 @@ public class SyncDashboard {
     public void sync(CodeQuality codeQuality) {
         ObjectId buildId = codeQuality.getBuildId();
         if (buildId == null) return;
-        Build build = buildRepository.findOne(buildId);
-        if (build == null) return;
-        relatedCollectorItemRepository.saveRelatedItems(build.getCollectorItemId(), codeQuality.getCollectorItemId(), this.getClass().toString(), CODEQUALITY_TRIGGERED_REASON);
+        buildRepository.findById(buildId).ifPresent(build ->
+                relatedCollectorItemRepository.saveRelatedItems(build.getCollectorItemId(), codeQuality.getCollectorItemId(), this.getClass().toString(), CODEQUALITY_TRIGGERED_REASON)
+        );
     }
 
 
@@ -170,20 +173,15 @@ public class SyncDashboard {
      * @param relatedCollectorItem
      * @throws SyncException
      */
-    public void sync(RelatedCollectorItem relatedCollectorItem) throws SyncException{
+    public void sync(RelatedCollectorItem relatedCollectorItem) throws SyncException {
         ObjectId left = relatedCollectorItem.getLeft();
         ObjectId right = relatedCollectorItem.getRight();
-        CollectorItem leftItem = collectorItemRepository.findOne(left);
-        CollectorItem rightItem = collectorItemRepository.findOne(right);
+        CollectorItem leftItem = collectorItemRepository.findById(left).orElseThrow(() -> new SyncException("Missing left collector item"));
+        CollectorItem rightItem = collectorItemRepository.findById(right).orElseThrow(() -> new SyncException("Missing right collector item"));
+        ;
 
-        if (leftItem == null) throw new SyncException("Missing left collector item");
-        if (rightItem == null) throw new SyncException("Missing right collector item");
-
-        Collector leftCollector = collectorRepository.findOne(leftItem.getCollectorId());
-        Collector rightCollector = collectorRepository.findOne(rightItem.getCollectorId());
-
-        if (leftCollector == null) throw new SyncException("Missing left collector");
-        if (rightCollector == null) throw new SyncException("Missing right collector");
+        Collector leftCollector = collectorRepository.findById(leftItem.getCollectorId()).orElseThrow(() -> new SyncException("Missing left collector"));
+        Collector rightCollector = collectorRepository.findById(rightItem.getCollectorId()).orElseThrow(() -> new SyncException("Missing left collector"));
 
         List<Dashboard> dashboardsWithLeft = getDashboardsByCollectorItems(Sets.newHashSet(leftItem), leftCollector.getCollectorType());
         List<Dashboard> dashboardsWithRight = getDashboardsByCollectorItems(Sets.newHashSet(rightItem), rightCollector.getCollectorType());

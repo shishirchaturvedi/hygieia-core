@@ -20,13 +20,7 @@ public final class Encryption {
     }
 
     public static String getStringKey() throws EncryptionException {
-        SecretKey key = null;
-        try {
-            key = KeyGenerator.getInstance(ALGO).generateKey();
-        } catch (NoSuchAlgorithmException e) {
-            throw new EncryptionException("Cannot generate a secret key" + '\n' + e.getMessage());
-        }
-        return Base64.encodeBase64String(key.getEncoded());
+        return Base64.encodeBase64String(getSecretKey().getEncoded());
     }
 
     public static SecretKey getSecretKey() throws EncryptionException {

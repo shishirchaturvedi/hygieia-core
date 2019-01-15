@@ -5,13 +5,13 @@ import com.capitalone.dashboard.model.CodeQuality;
 import java.util.List;
 
 import org.bson.types.ObjectId;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.CrudRepository;
 
 /**
  * Repository for {@link CodeQuality} data.
  */
-public interface CodeQualityRepository extends CrudRepository<CodeQuality, ObjectId>, QueryDslPredicateExecutor<CodeQuality> {
+public interface CodeQualityRepository extends CrudRepository<CodeQuality, ObjectId>, QuerydslPredicateExecutor<CodeQuality> {
 
     /**
      * Finds the {@link CodeQuality} data point at the given timestamp for a specific

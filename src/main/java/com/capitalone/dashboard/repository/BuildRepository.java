@@ -3,7 +3,7 @@ package com.capitalone.dashboard.repository;
 import com.capitalone.dashboard.model.Build;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Repository for {@link Build} data.
  */
-public interface BuildRepository extends CrudRepository<Build, ObjectId>, QueryDslPredicateExecutor<Build> {
+public interface BuildRepository extends CrudRepository<Build, ObjectId>, QuerydslPredicateExecutor<Build> {
 
     /**
      * Finds the {@link Build} with the given number for a specific {@link com.capitalone.dashboard.model.CollectorItem}.

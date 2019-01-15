@@ -4,8 +4,6 @@ import com.capitalone.dashboard.event.sync.SyncDashboard;
 import com.capitalone.dashboard.model.BaseModel;
 import com.capitalone.dashboard.model.Build;
 import com.capitalone.dashboard.model.BuildStatus;
-import com.capitalone.dashboard.model.Collector;
-import com.capitalone.dashboard.model.CollectorItem;
 import com.capitalone.dashboard.model.Component;
 import com.capitalone.dashboard.model.Dashboard;
 import com.capitalone.dashboard.model.Pipeline;
@@ -129,29 +127,21 @@ public class BuildEventListener extends HygieiaMongoEventListener<Build> {
      * @return
      */
     private List<Dashboard> findAllDashboardsForBuild(Build build) {
-        List<Dashboard> dashboards = new ArrayList<>();
+        final List<Dashboard> dashboards = new ArrayList<>();
         if (build == null || build.getCollectorItemId() == null) {
             //return an empty list if the build is not associated with a Dashboard
             return dashboards;
         }
-        CollectorItem buildCollectorItem = collectorItemRepository.findOne(build.getCollectorItemId());
-        if(buildCollectorItem != null) {
+
+        return collectorItemRepository.findById(build.getCollectorItemId()).map(buildCollectorItem -> {
             List<Component> components = componentRepository.findByBuildCollectorItemId(buildCollectorItem.getId());
             if (!components.isEmpty()) {
                 //return an empty list if the build is not associated with a Dashboard
                 List<ObjectId> componentIds = components.stream().map(BaseModel::getId).collect(Collectors.toList());
-                dashboards = dashboardRepository.findByApplicationComponentIdsIn(componentIds);
+                return dashboardRepository.findByApplicationComponentIdsIn(componentIds);
             }
-        }
-        return dashboards;
+            return dashboards;
+        }).orElse(dashboards);
     }
 
-
-    private CollectorItem getCollectorItem(ObjectId id) {
-        return collectorItemRepository.findOne(id);
-    }
-
-    private Collector getCollector(ObjectId id) {
-        return collectorRepository.findOne(id);
-    }
 }

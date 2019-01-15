@@ -9,7 +9,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface AuditResultRepository extends PagingAndSortingRepository<AuditResult, ObjectId> {
 
-    AuditResult findById(ObjectId id);
     Page<AuditResult> findByAuditType(AuditType auditType, Pageable pageable);
     Iterable<AuditResult> findByDashboardTitle(String dashboardTitle);
     Iterable<AuditResult> findByDashboardTitleAndAuditType(String dashboardTitle, AuditType auditType);

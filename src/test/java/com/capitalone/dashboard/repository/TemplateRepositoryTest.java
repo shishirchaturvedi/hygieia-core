@@ -52,7 +52,7 @@ public class TemplateRepositoryTest extends FongoBaseRepositoryTest {
         ObjectId templateId = ObjectId.get();
         mockTemplate.setId(templateId);
         templateRepository.save(mockTemplate);
-        templateRepository.delete(templateId);
+        templateRepository.deleteById(templateId);
         Template actual = templateRepository.findByTemplate("template1");
         assertNull(actual);
     }

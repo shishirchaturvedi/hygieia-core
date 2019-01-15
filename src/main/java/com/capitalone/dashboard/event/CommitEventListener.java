@@ -19,7 +19,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,12 +63,20 @@ public class CommitEventListener extends HygieiaMongoEventListener<Commit> {
 
     /**
      * Finds all dashboards for a commit by way of the SCM collector item id of the dashboard that is tied to the commit
+     *
      * @param commit
      * @return
      */
-    private List<Dashboard> findAllDashboardsForCommit(Commit commit){
-        if (commit.getCollectorItemId() == null) return new ArrayList<>();
-        CollectorItem commitCollectorItem = collectorItemRepository.findOne(commit.getCollectorItemId());
+    @SuppressWarnings("unchecked")
+    private List<Dashboard> findAllDashboardsForCommit(Commit commit) {
+        if (commit.getCollectorItemId() == null) return Collections.EMPTY_LIST;
+
+        return collectorItemRepository.findById(commit.getCollectorItemId())
+                .map(this::findAllDashboardsByCollectorItemId)
+                .orElse(Collections.EMPTY_LIST);
+    }
+
+    private List<Dashboard> findAllDashboardsByCollectorItemId(final CollectorItem commitCollectorItem) {
         List<Component> components = componentRepository.findBySCMCollectorItemId(commitCollectorItem.getId());
         List<ObjectId> componentIds = components.stream().map(BaseModel::getId).collect(Collectors.toList());
         return dashboardRepository.findByApplicationComponentIdsIn(componentIds);

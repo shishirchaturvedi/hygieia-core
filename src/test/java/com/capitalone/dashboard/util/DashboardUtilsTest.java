@@ -47,7 +47,7 @@ public class DashboardUtilsTest extends FongoBaseRepositoryTest{
         Component component3 = getComponent("TestComponent2");
         component3.addCollectorItem(collector11.getCollectorType(), collectorItem2);
 
-        componentRepository.save(Arrays.asList(component1,component2,component3));
+        componentRepository.saveAll(Arrays.asList(component1,component2,component3));
 
 
         Set<ObjectId> uniqueIds = DashboardUtils.getUniqueCollectorItemIDsFromAllComponents(componentRepository,collector1);

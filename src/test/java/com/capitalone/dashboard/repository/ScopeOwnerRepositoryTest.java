@@ -9,17 +9,25 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.capitalone.dashboard.testutil.FongoConfig;
 import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.capitalone.dashboard.model.Collector;
 import com.capitalone.dashboard.model.CollectorItem;
 import com.capitalone.dashboard.model.ScopeOwnerCollectorItem;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-public class ScopeOwnerRepositoryTest extends FongoBaseRepositoryTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {FongoConfig.class})
+@DirtiesContext
+public class ScopeOwnerRepositoryTest {
 	private static ScopeOwnerCollectorItem mockV1ScopeOwner;
 	private static ScopeOwnerCollectorItem mockJiraScopeOwner;
 	private static ScopeOwnerCollectorItem mockJiraScopeOwner2;

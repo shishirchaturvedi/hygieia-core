@@ -7,6 +7,7 @@ import com.capitalone.dashboard.model.DashboardType;
 import com.capitalone.dashboard.repository.CollectorItemRepository;
 import com.capitalone.dashboard.repository.CollectorRepository;
 import com.mongodb.DBObject;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
@@ -66,7 +67,7 @@ public class DashboardEventListener extends AbstractMongoEventListener<Dashboard
      */
     @Override
     public void onAfterDelete(AfterDeleteEvent<Dashboard> event) {
-        DBObject dbo = event.getDBObject();
+        Document dbo = event.getDocument();
         String dashboardId = dbo.get("id").toString();
 
         CollectorItem item = getDashboardCollectorItem(dashboardId, getProductCollector().getId());

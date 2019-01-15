@@ -49,7 +49,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
 
     @Override
     @Bean
-    public MongoClient mongo() throws Exception {
+    public MongoClient mongoClient()  {
 
         MongoClient client;
         LOGGER.info("ReplicaSet" + dbreplicaset);
@@ -101,7 +101,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
 
     @Bean
     public MongoTemplate mongoTemplate() throws Exception {
-        return new MongoTemplate(mongo(), getDatabaseName());
+        return new MongoTemplate(mongoClient(), getDatabaseName());
     }
 
     @Bean
