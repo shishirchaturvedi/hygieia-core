@@ -29,7 +29,9 @@ public enum CollectorType {
     InfraPerformance,
     Score,
     TEAM,
-    Audit;
+    Audit,
+    Log,
+    AutoDiscover;
 
     public static CollectorType fromString(String value) {
         for (CollectorType collectorType : values()) {

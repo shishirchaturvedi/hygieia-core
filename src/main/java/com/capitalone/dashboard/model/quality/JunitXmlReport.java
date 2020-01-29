@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Contains the results of exexuting a testsuite
+ * Contains the results of executing a testsuite
  * <p>
  * <p>Java class for testsuite complex type.
  * <p>
@@ -120,7 +120,7 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "testsuite")
-public class JunitXmlReport implements CodeQualityVisitee {
+public class JunitXmlReport implements QualityVisitee {
 
     @XmlElement(required = true)
     protected JunitXmlReport.Properties properties;
@@ -145,6 +145,8 @@ public class JunitXmlReport implements CodeQualityVisitee {
     protected int errors;
     @XmlAttribute(name = "time", required = true)
     protected BigDecimal time;
+    @XmlAttribute(name = "skipped", required = true)
+    protected String skipped;
 
     /**
      * Gets the value of the properties property.
@@ -355,8 +357,16 @@ public class JunitXmlReport implements CodeQualityVisitee {
         this.time = value;
     }
 
+    public String getSkipped() {
+        return skipped;
+    }
+
+    public void setSkipped(String skipped) {
+        this.skipped = skipped;
+    }
+
     @Override
-    public void accept(CodeQualityVisitor visitor) {
+    public void accept(QualityVisitor visitor) {
         visitor.visit(this);
     }
 
@@ -556,6 +566,8 @@ public class JunitXmlReport implements CodeQualityVisitee {
         protected String classname;
         @XmlAttribute(name = "time", required = true)
         protected BigDecimal time;
+        @XmlAttribute(name = "skipped", required = true)
+        protected String skipped;
 
         /**
          * Gets the value of the error property.
@@ -655,6 +667,15 @@ public class JunitXmlReport implements CodeQualityVisitee {
          */
         public void setTime(BigDecimal value) {
             this.time = value;
+        }
+
+
+        public String getSkipped() {
+            return skipped;
+        }
+
+        public void setSkipped(String skipped) {
+            this.skipped = skipped;
         }
 
         /**

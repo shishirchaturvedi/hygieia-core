@@ -23,6 +23,9 @@ public interface DashboardRepository extends PagingAndSortingRepository<Dashboar
 	List<Dashboard> findByOwners(Owner owner);
 	List<Dashboard> findByOwnersAndTypeContainingIgnoreCase(Owner owner, String type);
 
+	@Query(value="{'template': ?0}")
+	List<Dashboard> findByTemplate(String template);
+
 	List<Dashboard> findByTitle(String title);
 	Dashboard findByTitleAndType(String title, DashboardType type);
 
@@ -48,6 +51,7 @@ public interface DashboardRepository extends PagingAndSortingRepository<Dashboar
 	Dashboard findByConfigurationItemBusServNameIgnoreCaseAndConfigurationItemBusAppNameIgnoreCase(String appName, String compName);
 	List<Dashboard> findAllByTypeAndConfigurationItemBusServNameContainingIgnoreCase(DashboardType type, String appName);
 	List<Dashboard> findAllByConfigurationItemBusServNameContainingIgnoreCaseAndConfigurationItemBusAppNameContainingIgnoreCase(String appName, String compName);
+	List<Dashboard> findAllByTypeAndConfigurationItemBusServNameContainingIgnoreCaseAndConfigurationItemBusAppNameContainingIgnoreCase(DashboardType type, String appName, String compName);
 
 	Page<Dashboard> findAll(Pageable page);
 	Page<Dashboard> findAllByTypeContainingIgnoreCase(String type,Pageable pageable);
